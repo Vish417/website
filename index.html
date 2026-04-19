@@ -3,46 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Simple GitHub Page updated</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Takkt Agentforce Test Page</title>
     <style>
-        /* Optional: Apply Inter font */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            padding: 50px;
+            text-align: center;
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to My Page!</h1>
-        <p class="text-gray-600 text-lg mb-6">
-            This is a simple HTML page, styled with Tailwind CSS, ready for GitHub Pages.
-            Feel free to edit this content and make it your own!
-        </p>
-        <a href="https://github.com/new" target="_blank" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out shadow-md hover:shadow-lg">
-            Create a New GitHub Repository
-        </a>
-    </div>
+<body>
+
+    <h1>Takkt Product Assistant</h1>
+    <p>Click the chat icon in the bottom right to talk to Agentforce.</p>
+
     <script type='text/javascript'>
-	function initEmbeddedMessaging() {
-		try {
-			embeddedservice_bootstrap.settings.language = 'en_US'; // For example, enter 'en' or 'en-US'
-
-			embeddedservice_bootstrap.init(
-				'00DgK000008ceYY',
-				'AgentForce_Channel',
-				'https://orgfarm-f9d73efa81-dev-ed.develop.my.site.com/ESWAgentForceChannel1755145119170',
-				{
-					scrt2URL: 'https://orgfarm-f9d73efa81-dev-ed.develop.my.salesforce-scrt.com'
-				}
-			);
-		} catch (err) {
-			console.error('Error loading Embedded Messaging: ', err);
-		}
-	};
-</script>
-<script type='text/javascript' src='https://orgfarm-f9d73efa81-dev-ed.develop.my.site.com/ESWAgentForceChannel1755145119170/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
-
-</body>
+        function initEmbeddedMessaging() {
+            try {
+                embeddedservice_bootstrap.settings.language = 'en_US'; // Or your target locale
+                embeddedservice_bootstrap.init(
+                    '00D9K00000L1UMb',
+                    'taakt_msg',
+                    'https://takkt-eu--integ.sandbox.my.salesforce-scrt.com',
+                    {
+                        scrt2URL: 'https://takkt-eu--integ.sandbox.my.salesforce-scrt.com'
+                    }
+                );
+            } catch (err) {
+                console.error('Error loading Embedded Messaging: ', err);
+            }
+        };
+    </script>
+    <script type='text/javascript' src='https://YOUR_ORG_DOMAIN.my.site.com/ESWtaaktmsg.../embeddedservice/asyncclient/bootstrap.js' onload='initEmbeddedMessaging()'></script>
+    </body>
 </html>
