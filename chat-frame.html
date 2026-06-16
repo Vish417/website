@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  /* Force the widget to fill the entire iframe, acting like a fixed block */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  embedded-messaging {
+    /* Override Salesforce's fixed positioning to stick to the iframe boundaries */
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+</style>
+</head>
+<body>
+
+<script type='text/javascript'>
+	function initEmbeddedMessaging() {
+		try {
+			embeddedservice_bootstrap.settings.language = 'en_US'; 
+			embeddedservice_bootstrap.init(
+				'00D9K00000L1UMb',
+				'Takkt_ECOM',
+				'https://takkt-eu--integ.sandbox.my.site.com/ESWTakktECOM1777546973648',
+				{ scrt2URL: 'https://takkt-eu--integ.sandbox.my.salesforce-scrt.com' }
+			);
+		} catch (err) {
+			console.error('Error loading Embedded Messaging: ', err);
+		}
+	};
+
+    // Listen for the widget to be ready, then automatically launch the chat
+    window.addEventListener("onEmbeddedMessagingReady", () => {
+        console.log("MIAW Ready. Auto-launching chat...");
+        embeddedservice_bootstrap.utilAPI.launchChat();
+    });
+</script>
+<script type='text/javascript' src='https://takkt-eu--integ.sandbox.my.site.com/ESWTakktECOM1777546973648/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+
+</body>
+</html>
