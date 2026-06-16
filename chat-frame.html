@@ -40,6 +40,11 @@
 			console.error('Error loading Embedded Messaging: ', err);
 		}
 	};
+	// ---- ADDED HERE: Listen for the widget to be ready, then open it ----
+	window.addEventListener("onEmbeddedMessagingReady", () => {
+		console.log("Chat is ready! Auto-launching...");
+		embeddedservice_bootstrap.utilAPI.launchChat();
+	});
 </script>
 <script type='text/javascript' src='https://takkt-eu--integ.sandbox.my.site.com/ESWtakktGithub1777437432311/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
 
