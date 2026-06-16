@@ -17,7 +17,12 @@
     }
 
     /* ↓↓ ADDED — positions chat to the right side ↓↓ */
-    .embeddedServiceSidebar.layout-docked {
+    .embedded-messaging > .embeddedMessagingFrame[class~="maximized"] {
+       left: 0 !important;
+      right: auto !important;
+    }
+
+    .embedded-messaging > .embeddedMessagingFrame[class~="minimized"]{
        left: 0 !important;
       right: auto !important;
     }
