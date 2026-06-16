@@ -1,29 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Takkt Agentforce Test Page</title>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Takkt Agentforce Test Page</title>
+  <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f6f9;
       padding: 50px;
       text-align: center;
     }
-    .embeddedServiceSidebar.layout-docked .dockableContainer {      height: 600px !important;    }
-</style>
+
+    .embeddedServiceSidebar.layout-docked .dockableContainer {
+      height: 600px !important;
+    }
+
+    /* ↓↓ ADDED — positions chat to the right side ↓↓ */
+    .embeddedServiceSidebar.layout-docked {
+      left: auto !important;
+      right: 0 !important;
+    }
+    /* ↑↑ END OF ADDED CODE ↑↑ */
+
+  </style>
 </head>
 <body>
- 
+
   <h1>Takkt Product Assistant</h1>
-<p>Click the chat icon in the bottom right to talk to Agentforce.</p>
- 
+  <p>Click the chat icon in the bottom right to talk to Agentforce.</p>
+
   <script type='text/javascript'>
     function initEmbeddedMessaging() {
       try {
         embeddedservice_bootstrap.settings.language = 'de';
- 
+
         embeddedservice_bootstrap.init(
           '00D9K00000L1UMb',
           'takkt_Github',
@@ -32,23 +43,30 @@
             scrt2URL: 'https://takkt-eu--integ.sandbox.my.salesforce-scrt.com'
           }
         );
- 
-        window.addEventListener('onEmbeddedMessagingReady', () => {          // ↓↓ ADDED — always open chat on load and save state ↓↓         
-            embeddedservice_bootstrap.utilAPI.launchChat();          sessionStorage.setItem('chatOpen', 'true');  
-            // Keep tracking if user minimizes/closes          
-            window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {            sessionStorage.setItem('chatOpen', 'true');          });          window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {            sessionStorage.setItem('chatOpen', 'false');          });          // ↑↑ END OF ADDED CODE ↑↑        
+
+        window.addEventListener('onEmbeddedMessagingReady', () => {
+          embeddedservice_bootstrap.utilAPI.launchChat();
+          sessionStorage.setItem('chatOpen', 'true');
+
+          window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
+            sessionStorage.setItem('chatOpen', 'true');
+          });
+          window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
+            sessionStorage.setItem('chatOpen', 'false');
+          });
         });
+
       } catch (err) {
         console.error('Error loading Embedded Messaging: ', err);
       }
     }
-</script>
- 
+  </script>
+
   <script
     type='text/javascript'
     src='https://takkt-eu--integ.sandbox.my.site.com/ESWtakktGithub1777437432311/assets/js/bootstrap.min.js'
     onload='initEmbeddedMessaging()'
-></script>
- 
+  ></script>
+
 </body>
 </html>
