@@ -33,12 +33,11 @@
           }
         );
  
-        // ↓↓ ADDED HERE — auto-opens chat when widget is ready ↓↓
-        window.addEventListener('onEmbeddedMessagingReady', () => {
-          embeddedservice_bootstrap.utilAPI.launchChat();
+        window.addEventListener('onEmbeddedMessagingReady', () => {          // ↓↓ ADDED — always open chat on load and save state ↓↓         
+            embeddedservice_bootstrap.utilAPI.launchChat();          sessionStorage.setItem('chatOpen', 'true');  
+            // Keep tracking if user minimizes/closes          
+            window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {            sessionStorage.setItem('chatOpen', 'true');          });          window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {            sessionStorage.setItem('chatOpen', 'false');          });          // ↑↑ END OF ADDED CODE ↑↑        
         });
-        // ↑↑ END OF ADDED CODE ↑↑
- 
       } catch (err) {
         console.error('Error loading Embedded Messaging: ', err);
       }
