@@ -37,64 +37,6 @@
   <p>Click the chat icon in the bottom right to talk to Agentforce.</p>
 
   <script type='text/javascript'>
-    function deepFind(root, selector) {
-      if (!root) return null;
-      if (root.shadowRoot) {
-        const found = root.shadowRoot.querySelector(selector);
-        if (found) return { el: found, host: root };
-        const children = root.shadowRoot.querySelectorAll('*');
-        for (const child of children) {
-          const result = deepFind(child, selector);
-          if (result) return result;
-        }
-      }
-      return null;
-    }
-
-    function hideFileAttachmentButton() {
-      const container = document.querySelector('embeddedmessaging-container');
-      if (!container) {
-        console.log('container not found yet...');
-        return false;
-      }
-
-      const result = deepFind(container, 'embeddedmessaging-input-footer');
-      if (!result) {
-        console.log('input-footer not found yet...');
-        return false;
-      }
-
-      if (!result.el.shadowRoot) {
-        console.log('shadowRoot not found yet...');
-        return false;
-      }
-
-      const existing = result.el.shadowRoot.querySelector('#hideAttachStyle');
-      if (existing) {
-        console.log('already injected!');
-        return true;
-      }
-
-      const style = document.createElement('style');
-      style.id = 'hideAttachStyle';
-      style.textContent = `.fileAttachmentButtonWrapper { display: none !important; }`;
-      result.el.shadowRoot.appendChild(style);
-      console.log('SUCCESS - File attachment hidden!');
-      return true;
-    }
-
-    // Run every 500ms for up to 30 seconds
-    let attempts = 0;
-    const interval = setInterval(() => {
-      attempts++;
-      console.log('attempt', attempts);
-      const success = hideFileAttachmentButton();
-      if (success || attempts >= 60) {
-        clearInterval(interval);
-        console.log(success ? 'Done!' : 'Gave up after 60 attempts');
-      }
-    }, 500);
-    
     function initEmbeddedMessaging() {
       try {
         embeddedservice_bootstrap.settings.language = 'de';
@@ -112,11 +54,8 @@
           embeddedservice_bootstrap.utilAPI.launchChat();
           sessionStorage.setItem('chatOpen', 'true');
 
-        
-
           window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
             sessionStorage.setItem('chatOpen', 'true');
-            hideFileAttachmentButton();
           });
           window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
             sessionStorage.setItem('chatOpen', 'false');
