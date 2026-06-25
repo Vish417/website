@@ -37,27 +37,32 @@
   <p>Click the chat icon in the bottom right to talk to Agentforce.</p>
 
   <script type='text/javascript'>
+    function deepFind(root, selector) {
+      if (!root) return null;
+      if (root.shadowRoot) {
+        const found = root.shadowRoot.querySelector(selector);
+        if (found) return { el: found, host: root };
+        const children = root.shadowRoot.querySelectorAll('*');
+        for (const child of children) {
+          const result = deepFind(child, selector);
+          if (result) return result;
+        }
+      }
+      return null;
+    }
+
     function hideFileAttachmentButton() {
       const container = document.querySelector('embeddedmessaging-container');
       if (!container) return false;
 
-      function deepFind(root, selector) {
-        if (!root) return null;
-        if (root.shadowRoot) {
-          const found = root.shadowRoot.querySelector(selector);
-          if (found) return { el: found, host: root };
-          const children = root.shadowRoot.querySelectorAll('*');
-          for (const child of children) {
-            const result = deepFind(child, selector);
-            if (result) return result;
-          }
-        }
-        return null;
-      }
-
       const result = deepFind(container, 'embeddedmessaging-input-footer');
       if (result && result.el.shadowRoot) {
+        // Check if style already injected
+        const existing = result.el.shadowRoot.querySelector('#hideAttachStyle');
+        if (existing) return true;
+
         const style = document.createElement('style');
+        style.id = 'hideAttachStyle';
         style.textContent = `.fileAttachmentButtonWrapper { display: none !important; }`;
         result.el.shadowRoot.appendChild(style);
         console.log('File attachment hidden!');
@@ -66,10 +71,20 @@
       return false;
     }
 
-    function tryHide() {
+    // MutationObserver watches for chat elements being added to DOM
+    const observer = new MutationObserver(() => {
       const success = hideFileAttachmentButton();
-      if (!success) setTimeout(tryHide, 1000);
-    }
+      if (success) {
+        console.log('Done - stopping observer');
+        observer.disconnect();
+      }
+    });
+
+    // Start observing immediately
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
     
     function initEmbeddedMessaging() {
       try {
@@ -88,11 +103,11 @@
           embeddedservice_bootstrap.utilAPI.launchChat();
           sessionStorage.setItem('chatOpen', 'true');
 
-         setTimeout(tryHide, 2000);
+        
 
           window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
             sessionStorage.setItem('chatOpen', 'true');
-            setTimeout(tryHide, 500);
+            setTimeout(() => hideFileAttachmentButton(), 500);
           });
           window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
             sessionStorage.setItem('chatOpen', 'false');
