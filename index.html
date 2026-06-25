@@ -37,40 +37,40 @@
   <p>Click the chat icon in the bottom right to talk to Agentforce.</p>
 
   <script type='text/javascript'>
-     function deepShadowSearch(root, depth = 0) {
-      const allEls = root.querySelectorAll('*');
-      
-      for (const el of allEls) {
-        if (el.shadowRoot) {
-          console.log('Shadow root found in:', el.tagName, el.className);
-          
-          const found = el.shadowRoot.querySelector('.fileAttachmentButtonWrapper');
-          if (found) {
-            console.log('FOUND! Injecting style...');
-            const style = document.createElement('style');
-            style.textContent = `
-              .fileAttachmentButtonWrapper { display: none !important; }
-              embeddedmessaging-file-attachment-footer { display: none !important; }
-            `;
-            el.shadowRoot.appendChild(style);
-            console.log('Done! Button should be hidden.');
-            return true;
+    function hideFileAttachmentButton() {
+      const container = document.querySelector('embeddedmessaging-container');
+      if (!container) return false;
+
+      function deepFind(root, selector) {
+        if (!root) return null;
+        if (root.shadowRoot) {
+          const found = root.shadowRoot.querySelector(selector);
+          if (found) return { el: found, host: root };
+          const children = root.shadowRoot.querySelectorAll('*');
+          for (const child of children) {
+            const result = deepFind(child, selector);
+            if (result) return result;
           }
-          
-          deepShadowSearch(el.shadowRoot, depth + 1);
         }
+        return null;
+      }
+
+      const result = deepFind(container, 'embeddedmessaging-input-footer');
+      if (result && result.el.shadowRoot) {
+        const style = document.createElement('style');
+        style.textContent = `.fileAttachmentButtonWrapper { display: none !important; }`;
+        result.el.shadowRoot.appendChild(style);
+        console.log('File attachment hidden!');
+        return true;
       }
       return false;
     }
 
-    // Keep trying until chat loads
-    function tryHideAttachment() {
-      const found = deepShadowSearch(document);
-      if (!found) {
-        console.log('Not found yet, retrying...');
-        setTimeout(tryHideAttachment, 1000);
-      }
+    function tryHide() {
+      const success = hideFileAttachmentButton();
+      if (!success) setTimeout(tryHide, 1000);
     }
+    
     function initEmbeddedMessaging() {
       try {
         embeddedservice_bootstrap.settings.language = 'de';
@@ -88,11 +88,11 @@
           embeddedservice_bootstrap.utilAPI.launchChat();
           sessionStorage.setItem('chatOpen', 'true');
 
-          setTimeout(tryHideAttachment, 2000);
+         setTimeout(tryHide, 2000);
 
           window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
             sessionStorage.setItem('chatOpen', 'true');
-            setTimeout(tryHideAttachment, 1000);
+            setTimeout(tryHide, 500);
           });
           window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
             sessionStorage.setItem('chatOpen', 'false');
