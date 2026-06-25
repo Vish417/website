@@ -53,38 +53,47 @@
 
     function hideFileAttachmentButton() {
       const container = document.querySelector('embeddedmessaging-container');
-      if (!container) return false;
+      if (!container) {
+        console.log('container not found yet...');
+        return false;
+      }
 
       const result = deepFind(container, 'embeddedmessaging-input-footer');
-      if (result && result.el.shadowRoot) {
-        // Check if style already injected
-        const existing = result.el.shadowRoot.querySelector('#hideAttachStyle');
-        if (existing) return true;
+      if (!result) {
+        console.log('input-footer not found yet...');
+        return false;
+      }
 
-        const style = document.createElement('style');
-        style.id = 'hideAttachStyle';
-        style.textContent = `.fileAttachmentButtonWrapper { display: none !important; }`;
-        result.el.shadowRoot.appendChild(style);
-        console.log('File attachment hidden!');
+      if (!result.el.shadowRoot) {
+        console.log('shadowRoot not found yet...');
+        return false;
+      }
+
+      const existing = result.el.shadowRoot.querySelector('#hideAttachStyle');
+      if (existing) {
+        console.log('already injected!');
         return true;
       }
-      return false;
+
+      const style = document.createElement('style');
+      style.id = 'hideAttachStyle';
+      style.textContent = `.fileAttachmentButtonWrapper { display: none !important; }`;
+      result.el.shadowRoot.appendChild(style);
+      console.log('SUCCESS - File attachment hidden!');
+      return true;
     }
 
-    // MutationObserver watches for chat elements being added to DOM
-    const observer = new MutationObserver(() => {
+    // Run every 500ms for up to 30 seconds
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      console.log('attempt', attempts);
       const success = hideFileAttachmentButton();
-      if (success) {
-        console.log('Done - stopping observer');
-        observer.disconnect();
+      if (success || attempts >= 60) {
+        clearInterval(interval);
+        console.log(success ? 'Done!' : 'Gave up after 60 attempts');
       }
-    });
-
-    // Start observing immediately
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    }, 500);
     
     function initEmbeddedMessaging() {
       try {
@@ -107,7 +116,7 @@
 
           window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
             sessionStorage.setItem('chatOpen', 'true');
-            setTimeout(() => hideFileAttachmentButton(), 500);
+            hideFileAttachmentButton();
           });
           window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
             sessionStorage.setItem('chatOpen', 'false');
