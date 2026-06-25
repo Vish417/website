@@ -27,15 +27,6 @@
        left: 0 !important;
       right: auto !important;
     }
-    
-    embeddedmessaging-file-attachment-footer {
-      display: none !important;
-    }
-
-    .fileAttachmentButtonWrapper {
-      display: none !important;
-    }
-    
     /*↑↑ END OF ADDED CODE ↑↑ */
 
   </style>
@@ -46,6 +37,44 @@
   <p>Click the chat icon in the bottom right to talk to Agentforce.</p>
 
   <script type='text/javascript'>
+     function hideFileAttachment(iframeDoc) {
+      const style = iframeDoc.createElement('style');
+      style.textContent = `
+        embeddedmessaging-file-attachment-footer,
+        .fileAttachmentButtonWrapper {
+          display: none !important;
+        }
+      `;
+      iframeDoc.head.appendChild(style);
+    }
+
+    function watchForChatIframe() {
+      const observer = new MutationObserver(() => {
+        const iframe = document.querySelector('iframe.embeddedMessagingFrame');
+        if (iframe) {
+          iframe.addEventListener('load', () => {
+            try {
+              hideFileAttachment(iframe.contentDocument);
+            } catch (e) {
+              console.warn('Cannot access iframe (cross-origin):', e);
+            }
+          });
+
+          // If iframe already loaded
+          try {
+            if (iframe.contentDocument && iframe.contentDocument.head) {
+              hideFileAttachment(iframe.contentDocument);
+            }
+          } catch (e) {
+            console.warn('Cannot access iframe (cross-origin):', e);
+          }
+        }
+      });
+
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    watchForChatIframe();
     function initEmbeddedMessaging() {
       try {
         embeddedservice_bootstrap.settings.language = 'de';
