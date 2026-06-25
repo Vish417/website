@@ -37,44 +37,40 @@
   <p>Click the chat icon in the bottom right to talk to Agentforce.</p>
 
   <script type='text/javascript'>
-     function hideFileAttachment(iframeDoc) {
-      const style = iframeDoc.createElement('style');
-      style.textContent = `
-        embeddedmessaging-file-attachment-footer,
-        .fileAttachmentButtonWrapper {
-          display: none !important;
-        }
-      `;
-      iframeDoc.head.appendChild(style);
-    }
-
-    function watchForChatIframe() {
-      const observer = new MutationObserver(() => {
-        const iframe = document.querySelector('iframe.embeddedMessagingFrame');
-        if (iframe) {
-          iframe.addEventListener('load', () => {
-            try {
-              hideFileAttachment(iframe.contentDocument);
-            } catch (e) {
-              console.warn('Cannot access iframe (cross-origin):', e);
-            }
-          });
-
-          // If iframe already loaded
-          try {
-            if (iframe.contentDocument && iframe.contentDocument.head) {
-              hideFileAttachment(iframe.contentDocument);
-            }
-          } catch (e) {
-            console.warn('Cannot access iframe (cross-origin):', e);
+     function deepShadowSearch(root, depth = 0) {
+      const allEls = root.querySelectorAll('*');
+      
+      for (const el of allEls) {
+        if (el.shadowRoot) {
+          console.log('Shadow root found in:', el.tagName, el.className);
+          
+          const found = el.shadowRoot.querySelector('.fileAttachmentButtonWrapper');
+          if (found) {
+            console.log('FOUND! Injecting style...');
+            const style = document.createElement('style');
+            style.textContent = `
+              .fileAttachmentButtonWrapper { display: none !important; }
+              embeddedmessaging-file-attachment-footer { display: none !important; }
+            `;
+            el.shadowRoot.appendChild(style);
+            console.log('Done! Button should be hidden.');
+            return true;
           }
+          
+          deepShadowSearch(el.shadowRoot, depth + 1);
         }
-      });
-
-      observer.observe(document.body, { childList: true, subtree: true });
+      }
+      return false;
     }
 
-    watchForChatIframe();
+    // Keep trying until chat loads
+    function tryHideAttachment() {
+      const found = deepShadowSearch(document);
+      if (!found) {
+        console.log('Not found yet, retrying...');
+        setTimeout(tryHideAttachment, 1000);
+      }
+    }
     function initEmbeddedMessaging() {
       try {
         embeddedservice_bootstrap.settings.language = 'de';
@@ -92,8 +88,11 @@
           embeddedservice_bootstrap.utilAPI.launchChat();
           sessionStorage.setItem('chatOpen', 'true');
 
+          setTimeout(tryHideAttachment, 2000);
+
           window.addEventListener('onEmbeddedMessagingWindowMaximized', () => {
             sessionStorage.setItem('chatOpen', 'true');
+            setTimeout(tryHideAttachment, 1000);
           });
           window.addEventListener('onEmbeddedMessagingWindowMinimized', () => {
             sessionStorage.setItem('chatOpen', 'false');
